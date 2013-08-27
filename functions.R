@@ -34,8 +34,10 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValue) {
 	# select <- 'mixture' #element, compound or mixture
 	
 	if (select=='element') {
-		path <- '/cgi-bin/Xcom/xcom3_1-t'
-		dataToSend <- paste('ZSym=',Matter,'&Energies=',as.character(Energy/1000),'&OutOpt=PIC',sep='')
+		path <- '/cgi-bin/Xcom/xcom3_1'
+		# path <- '/cgi-bin/Xcom/xcom3_1-t'
+		dataToSend <- paste('ZSym=',Matter,'&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.01&ResizeFlag=on',sep='')
+		# dataToSend <- paste('ZSym=',Matter,'&Energies=',as.character(Energy/1000),'&OutOpt=PIC',sep='')
 	} else if (select=='compound') {
 		path <- '/cgi-bin/Xcom/xcom3_2-t'
 		dataToSend <- paste('Formula=',Matter,'&Energies=',as.character(Energy/1000),sep='')
@@ -44,15 +46,15 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValue) {
 		dataToSend <- paste('Formulae=',Matter,'&Energies=',as.character(Energy/1000),sep='')
 	}
 	
-	value <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
-	print(value)
-	value <- strsplit(value,'(cm2/g)\n\n       ',fixed=TRUE)
+	response <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
+	return(response)
+	value <- strsplit(response,'(cm2/g)\n\n       ',fixed=TRUE)
 	value <- value[[1]][2]
 	value <- strsplit(value,'\n</pre>\n',fixed=TRUE)
 	value <- value[[1]][1]
 	value <- strsplit(value,' ',fixed=TRUE)
 	
-	print(returnValue)
+	# print(returnValue)
 	
 	switch(returnValue,
 	

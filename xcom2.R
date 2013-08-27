@@ -4,6 +4,6 @@ libraryList <- c('XML', 'httpRequest')
 
 if (libraryCheck(libraryList)) {
 
-	xcomSingleEnergyData(1.23, 'Cu', 'element', 'IS')	
+	response <- xcomSingleEnergyData(1.23, 'Cu', 'element', 'IS')	
 	
 }
