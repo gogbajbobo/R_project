@@ -34,16 +34,20 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValueType) {
 	# select <- 'mixture' #element, compound or mixture
 	
 	if (select=='element') {
-		# path <- '/cgi-bin/Xcom/xcom3_1'
+
 		path <- '/cgi-bin/Xcom/xcom3_1-t'
-		# dataToSend <- paste('ZSym=',Matter,'&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.01&ResizeFlag=on',sep='')
 		dataToSend <- paste('ZSym=',Matter,'&Energies=',as.character(Energy/1000),'&OutOpt=PIC',sep='')
+
 	} else if (select=='compound') {
+
 		path <- '/cgi-bin/Xcom/xcom3_2-t'
 		dataToSend <- paste('Formula=',Matter,'&Energies=',as.character(Energy/1000),sep='')
+
 	} else if (select=='mixture') {
+
 		path <- '/cgi-bin/Xcom/xcom3_3-t'
 		dataToSend <- paste('Formulae=',Matter,'&Energies=',as.character(Energy/1000),sep='')
+
 	}
 	
 	response <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
@@ -73,38 +77,27 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValueType) {
 
 xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 	
+	# print('xcomEnergyData')
 	
-	# Energy <- 1.23 #KeV
-	# ElemName <- 'Cu'
-	# Compound <- 'KBr'
-	# Mixture <- paste('Cu+0.7','Zn+0.25','NaCl+0.05',sep='%0D%0A') #ElementName+FractionByWeight
-	# select <- 'mixture' #element, compound or mixture
+	if (is.null(data.env$dataList[[Matter]])) {
+		
+		data.env$dataList[[Matter]] <<- getDataFromXCOM(Matter, select)
+		print('no data')
+		# print(data.env$dataList)
+		
+	}	
+
+	# print(data.env$dataList)
+
+	XCOMData <- data.env$dataList[[Matter]]
 	
-	parameters <- '&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.1&ResizeFlag=on'
-	if (select=='element') {
-		path <- '/cgi-bin/Xcom/xcom3_1'
-		dataToSend <- paste('ZSym=', Matter, parameters, sep='')
-	} else if (select=='compound') {
-		path <- '/cgi-bin/Xcom/xcom3_2'
-		dataToSend <- paste('Formula=', Matter, parameters, sep='')
-	} else if (select=='mixture') {
-		path <- '/cgi-bin/Xcom/xcom3_3'
-		dataToSend <- paste('Formulae=', Matter, parameters ,sep='')
-	}
-	
-	response <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
-	response <- strsplit(response, '<html>', fixed=TRUE)
-	# print(response)
-	response <- response[[1]][2]
-	responseHtml <- htmlParse(response, asText=TRUE)
-	table <- getNodeSet(responseHtml, '//table')
-	tr <- getNodeSet(table[[1]], '//tr')
-	
-	for (i in 5:length(tr)) {
-		td1 <- getNodeSet(tr[[i-1]], './td')
+	# print(XCOMData)
+		
+	for (i in 5:length(XCOMData)) {
+		td1 <- getNodeSet(XCOMData[[i-1]], './td')
 		en1 <- as.numeric(xmlValue(td1[[2]])) * 1000
 
-		td2 <- getNodeSet(tr[[i]], './td')
+		td2 <- getNodeSet(XCOMData[[i]], './td')
 		en2 <- as.numeric(xmlValue(td2[[2]])) * 1000
 		
 		if (Energy >= en1 && Energy < en2) {
@@ -121,7 +114,51 @@ xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 }
 
 
+getDataFromXCOM <- function(Matter, select) {
+	
+	# print('getDataFromXCOM')
+	
+	# Energy <- 1.23 #KeV
+	# ElemName <- 'Cu'
+	# Compound <- 'KBr'
+	# Mixture <- paste('Cu+0.7','Zn+0.25','NaCl+0.05',sep='%0D%0A') #ElementName+FractionByWeight
+	# select <- 'mixture' #element, compound or mixture
+	
+	parameters <- '&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.1&ResizeFlag=on'
+
+	if (select=='element') {
+
+		path <- '/cgi-bin/Xcom/xcom3_1'
+		dataToSend <- paste('ZSym=', Matter, parameters, sep='')
+
+	} else if (select=='compound') {
+
+		path <- '/cgi-bin/Xcom/xcom3_2'
+		dataToSend <- paste('Formula=', Matter, parameters, sep='')
+
+	} else if (select=='mixture') {
+
+		path <- '/cgi-bin/Xcom/xcom3_3'
+		dataToSend <- paste('Formulae=', Matter, parameters ,sep='')
+
+	}
+	
+	response <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
+	response <- strsplit(response, '<html>', fixed=TRUE)
+	# print(response)
+	response <- response[[1]][2]
+	responseHtml <- htmlParse(response, asText=TRUE)
+	table <- getNodeSet(responseHtml, '//table')
+	tr <- getNodeSet(table[[1]], '//tr')
+	
+	return(tr)
+	
+}
+
+
 ipData <- function(lowValues, highValues, Energy, returnValueType, ipType) {
+	
+	# print('ipData')
 	
 	lowEnergy <- as.numeric(xmlValue(lowValues[[2]])) * 1000
 	highEnergy <- as.numeric(xmlValue(highValues[[2]])) * 1000
@@ -148,6 +185,7 @@ ipData <- function(lowValues, highValues, Energy, returnValueType, ipType) {
 linearIp <- function(x, x1, x2, y1, y2) {
 	
 	# print(paste(c('linearIp', x, x1, x2, y1, y2)))
+	
 	y <- y1 + ((y2 - y1) / (x2 - x1)) * (x - x1)
 	return(y)
 	
