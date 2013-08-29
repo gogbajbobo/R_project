@@ -34,10 +34,10 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValue) {
 	# select <- 'mixture' #element, compound or mixture
 	
 	if (select=='element') {
-		path <- '/cgi-bin/Xcom/xcom3_1'
-		# path <- '/cgi-bin/Xcom/xcom3_1-t'
-		dataToSend <- paste('ZSym=',Matter,'&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.01&ResizeFlag=on',sep='')
-		# dataToSend <- paste('ZSym=',Matter,'&Energies=',as.character(Energy/1000),'&OutOpt=PIC',sep='')
+		# path <- '/cgi-bin/Xcom/xcom3_1'
+		path <- '/cgi-bin/Xcom/xcom3_1-t'
+		# dataToSend <- paste('ZSym=',Matter,'&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.01&ResizeFlag=on',sep='')
+		dataToSend <- paste('ZSym=',Matter,'&Energies=',as.character(Energy/1000),'&OutOpt=PIC',sep='')
 	} else if (select=='compound') {
 		path <- '/cgi-bin/Xcom/xcom3_2-t'
 		dataToSend <- paste('Formula=',Matter,'&Energies=',as.character(Energy/1000),sep='')
@@ -47,7 +47,7 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValue) {
 	}
 	
 	response <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
-	return(response)
+	# return(response)
 	value <- strsplit(response,'(cm2/g)\n\n       ',fixed=TRUE)
 	value <- value[[1]][2]
 	value <- strsplit(value,'\n</pre>\n',fixed=TRUE)
@@ -56,47 +56,16 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValue) {
 	
 	# print(returnValue)
 	
-	switch(returnValue,
-	
-		CS = {
-			#CoherentScattering
-			return(value[[1]][2])
-		},
+	valueTypes <- c('CS', 'IS', 'PEA', 'PPNF', 'PPEF', 'AWCS', 'AWOCS')
+		# CS = CoherentScattering
+		# IS = IncoherentScattering
+		# PEA = PhotoElectricAbsorption
+		# PPNF = PairProductionInNuclearField
+		# PPEF = PairProductionInElectronField
+		# AWCS = AttenuationWithCoherentScattering
+		# AWOCS = AttenuationWithOutCoherentScattering
 
-		IS = {
-			#IncoherentScattering
-			return(value[[1]][3])
-		},
-	
-		PEA = {
-			#PhotoElectricAbsorption
-			return(value[[1]][4])
-		},
-
-		PPNF = {
-			#PairProductionInNuclearField
-			return(value[[1]][5])
-		},
-	
-		PPEF = {
-			#PairProductionInElectronField
-			return(value[[1]][6])
-		},
-
-		AWCS = {
-			#AttenuationWithCoherentScattering
-			return(value[[1]][7])
-		},
-
-		AWOCS = {
-			#AttenuationWithOutCoherentScattering
-			return(value[[1]][8])
-		},
+	index <- match(returnValue, valueTypes) + 1
+	return(value[[1]][index])
 		
-		{
-			return(FALSE)
-		}
-	
-	)
-	
 }

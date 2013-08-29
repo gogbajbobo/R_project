@@ -6,4 +6,6 @@ if (libraryCheck(libraryList)) {
 
 	response <- xcomSingleEnergyData(1.23, 'Cu', 'element', 'IS')	
 	
+	print(response)
+	
 }
