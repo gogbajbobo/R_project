@@ -114,6 +114,69 @@ xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 }
 
 
+xcom1 <- function(mixture,LinesEy,mode='emix') {
+  Energy <- paste(sort(LinesEy)/1E6,collapse='%0D%0A')#MeV
+  ElemName <- 'Cu'
+  Compound <- 'Air'
+  
+  if (mode!='emix'){
+    Mixture <- paste(mixture,collapse='%0D%0A') #ElementName+FractionByWeight
+  }
+  else {
+    Mixture <- paste(paste0(names(mixture),'+',mixture),collapse='%0D%0A') #ElementName+FractionByWeight
+  }
+  
+  
+  select <- 'mixture' #element, compound or mixture
+  
+  if (select=='element') {
+    path <- '/cgi-bin/Xcom/xcom3_1-t'
+    dataToSend <- paste('ZSym=',ElemName,'&Energies=',as.character(Energy),'&OutOpt=PIC',sep='')
+  } else if (select=='compound') {
+    path <- '/cgi-bin/Xcom/xcom3_2-t'
+    dataToSend <- paste('Formula=',Compound,'&Energies=',as.character(Energy),sep='')
+  } else if (select=='mixture') {
+    path <- '/cgi-bin/Xcom/xcom3_3-t'
+    dataToSend <- paste('Formulae=',Mixture,'&Energies=',as.character(Energy),sep='')
+  }
+  
+  value <- simplePostToHost('physics.nist.gov',path,'www.iptm.ru', dataToSend)
+  value <- strsplit(value,'(cm2/g)\n\n       ',fixed=TRUE)
+  value <- value[[1]][2]
+  value <- strsplit(value,'\n</pre>\n',fixed=TRUE)
+  value <- value[[1]][1]
+  values <- strsplit(value,'\n       ',fixed=TRUE)
+  
+  # m <- matrix(,dim=c(0,length(lineny)))
+  for (i in 1:length(LinesEy)) {
+    #     print(i)
+    value <- strsplit(values[[1]][i],' ',fixed=TRUE)
+    CS <- value[[1]][2] #CoherentScattering
+    # print(c('CoherentScattering, cm2/g',CS))
+    IS <- value[[1]][3] #IncoherentScattering
+    # print(c('IncoherentScattering, cm2/g',IS))
+    PEA <- value[[1]][4] #PhotoElectricAbsorption
+    #     print(c('PhotoElectricAbsorption, cm2/g',PEA))
+    PPNF <- value[[1]][5] #PairProductionInNuclearField
+    # print(c('PairProductionInNuclearField, cm2/g',PPNF))
+    PPEF <- value[[1]][6] #PairProductionInElectronField
+    # print(c('PairProductionInElectronField, cm2/g',PPEF))
+    AWCS <- value[[1]][7] #AttenuationWithCoherentScattering
+    #     print(c('AttenuationWithCoherentScattering, cm2/g',AWCS))
+    AWOCS <- value[[1]][8] #AttenuationWithOutCoherentScattering
+    # print(c('AttenuationWithOutCoherentScattering, cm2/g',AWOCS)) 
+    if (i==1) {
+      m <- c(CS,IS,PEA,PPNF,PPEF,AWCS,AWOCS)
+      names(m) <- c("CS","IS","PEA","PPNF","PPEF","AWCS","AWOCS")
+    }    
+    if (i!=1) m <- rbind(m,c(CS,IS,PEA,PPNF,PPEF,AWCS,AWOCS))
+  }
+  class(m) <- "numeric"
+  rownames(m) <- names(sort(LinesEy))
+  return(m)
+}
+
+
 getDataFromXCOM <- function(Matter, select) {
 	
 	# print('getDataFromXCOM')
