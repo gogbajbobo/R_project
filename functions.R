@@ -81,7 +81,7 @@ xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 	
 	if (is.null(data.env$dataList[[Matter]])) {
 		
-		data.env$dataList[[Matter]] <<- getDataFromXCOM(Matter, select)
+		data.env$dataList[[Matter]] <<- getDataFromXCOM(Matter, select, mode='emix')
 		print('no data')
 		# print(data.env$dataList)
 		
