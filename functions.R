@@ -177,7 +177,7 @@ xcom1 <- function(mixture,LinesEy,mode='emix') {
 }
 
 
-getDataFromXCOM <- function(Matter, select) {
+getDataFromXCOM <- function(Matter, select, mode='emix') {
 	
 	# print('getDataFromXCOM')
 	
@@ -186,7 +186,14 @@ getDataFromXCOM <- function(Matter, select) {
 	# Compound <- 'KBr'
 	# Mixture <- paste('Cu+0.7','Zn+0.25','NaCl+0.05',sep='%0D%0A') #ElementName+FractionByWeight
 	# select <- 'mixture' #element, compound or mixture
-	
+  
+  if (mode!='emix'){
+    Mixture <- paste(mixture,collapse='%0D%0A') #ElementName+FractionByWeight
+  }
+  else {
+    Mixture <- paste(paste0(names(Matter),'+',Matter),collapse='%0D%0A') #ElementName+FractionByWeight
+  }
+  
 	parameters <- '&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.1&ResizeFlag=on'
 
 	if (select=='element') {
@@ -202,7 +209,7 @@ getDataFromXCOM <- function(Matter, select) {
 	} else if (select=='mixture') {
 
 		path <- '/cgi-bin/Xcom/xcom3_3'
-		dataToSend <- paste('Formulae=', Matter, parameters ,sep='')
+		dataToSend <- paste('Formulae=', Mixture, parameters ,sep='')
 
 	}
 	
@@ -213,8 +220,8 @@ getDataFromXCOM <- function(Matter, select) {
 	responseHtml <- htmlParse(response, asText=TRUE)
 	table <- getNodeSet(responseHtml, '//table')
 	tr <- getNodeSet(table[[1]], '//tr')
-	
-	return(tr)
+
+  return(tr)
 	
 }
 
