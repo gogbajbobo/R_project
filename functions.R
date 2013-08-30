@@ -78,13 +78,16 @@ xcomSingleEnergyData <- function(Energy, Matter, select, returnValueType) {
 xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 	
 	# print('xcomEnergyData')
-	
+  if (select=='mixture') {
+    Matter <- paste(paste0(names(Matter),'+',Matter),collapse='%0D%0A') #ElementName+FractionByWeight    
+  }  
+    	
 	if (is.null(data.env$dataList[[Matter]])) {
 		
-		data.env$dataList[[Matter]] <<- getDataFromXCOM(Matter, select, mode='emix')
+		data.env$dataList[[Matter]] <<- getDataFromXCOM(Matter, select)
 		print('no data')
 		# print(data.env$dataList)
-		
+    
 	}	
 
 	# print(data.env$dataList)
@@ -114,7 +117,7 @@ xcomEnergyData <- function(Energy, Matter, select, returnValueType, ipType) {
 }
 
 
-getDataFromXCOM <- function(Matter, select, mode='emix') {
+getDataFromXCOM <- function(Matter, select) {
 	
 	# print('getDataFromXCOM')
 	
@@ -124,12 +127,7 @@ getDataFromXCOM <- function(Matter, select, mode='emix') {
 	# Mixture <- paste('Cu+0.7','Zn+0.25','NaCl+0.05',sep='%0D%0A') #ElementName+FractionByWeight
 	# select <- 'mixture' #element, compound or mixture
   
-  if (mode!='emix'){
-    Mixture <- paste(mixture,collapse='%0D%0A') #ElementName+FractionByWeight
-  }
-  else {
-    Mixture <- paste(paste0(names(Matter),'+',Matter),collapse='%0D%0A') #ElementName+FractionByWeight
-  }
+#   Mixture <- paste(paste0(names(Matter),'+',Matter),collapse='%0D%0A') #ElementName+FractionByWeight
   
 	parameters <- '&OutOpt=PIC&Graph0=on&NumAdd=1&Output=on&WindowXmin=0.001&WindowXmax=0.1&ResizeFlag=on'
 
@@ -146,7 +144,7 @@ getDataFromXCOM <- function(Matter, select, mode='emix') {
 	} else if (select=='mixture') {
 
 		path <- '/cgi-bin/Xcom/xcom3_3'
-		dataToSend <- paste('Formulae=', Mixture, parameters ,sep='')
+		dataToSend <- paste('Formulae=', Matter, parameters ,sep='')
 
 	}
 	

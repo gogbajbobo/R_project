@@ -38,10 +38,10 @@ if (libraryCheck(libraryList)) {
 	
 	# вызов функции
 	
-# 	response <- xcomEnergyData(1.23, 'Cu', 'element', 'AWCS', 'linear')
-	response <- xcomEnergyData(xlines['K']/1E3, est_mix, 'mixture', 'AWCS', 'linear')
+  # response <- xcomEnergyData(1.23, 'Cu', 'element', 'AWCS', 'linear')
+	response <- xcomEnergyData(xlines['Ca']/1E3, est_mix, 'mixture', 'AWCS', 'linear')
 	# response <- xcomEnergyData(1.23, 'KBr', 'compound', 'AWCS', 'linear')
-	# response <- xcomEnergyData(1.23, paste('Cu+0.7','Zn+0.25','NaCl+0.05',sep='%0D%0A'), 'mixture', 'AWCS', 'linear')
+  #	response <- xcomEnergyData(xlines['K']/1E3, paste('K+1','Ca+1','Ti+1','Mn+1','Fe+1',sep='%0D%0A'), 'mixture', 'AWCS', 'linear')
 
 	print(response)
 
