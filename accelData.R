@@ -4,7 +4,9 @@ accelData <- read.table(file_name,,dec='.',sep='',header=TRUE)
 
 # print(accelData)
 
-data <- accelData[,1]
+i <- 1
+
+data <- accelData[,i]
 n <- length(data)
 
-plot(1:n, data, type = 'l')
+plot(1:n, data, type = 'l', main = names(accelData)[i])
