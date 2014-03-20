@@ -1,6 +1,9 @@
 file_path <- '/Users/grimax/Documents/Work/ИПТМ эксперимент/2011/Spectrum quantify/spectrums/'
 file_name <- 'CTGS_1_20min.spx'
 
+e_step <- 5
+shift <- array(c(5,1))
+
 xmldoc <- xmlParse(paste(file_path,file_name,sep=''))
 channels_values <- xmlValue(getNodeSet(xmldoc,'//Channels')[[1]])
 channel_count <- xmlValue(getNodeSet(xmldoc,'//ChannelCount')[[1]])
