@@ -7,17 +7,12 @@ N <- 970 # normalize coefficient
 T1 <- 0 # inner thickness, µm
 T2 <- 100 # outer thickness, µm
 
-# sm
-# diff 	95360.41
-# R1	24
-# R2 	157
-# N		970
-
-# smooth(sm)
-# diff 	42660.14
-# R1	24
-# R2 	157
-# N		971
+# sm 			linear		parabolic
+# diff 			95360.41	235006.6
+# R1			24			24
+# R2 			157			310
+# N				970			930
+# int 			1.936		1.035
 
 Ring_Thickness <- function(r) {
 
@@ -31,7 +26,16 @@ Ring_Thickness <- function(r) {
 
 	} else {
 
-		t <- (T2 - T1) * (r - R1) / (R2 - R1) # linear profile function
+		# linear profile function
+		t <- (T2 - T1) * (r - R1) / (R2 - R1)
+
+		# parabolic profile
+		# k <- ((T2 - T1) / 2) / sqrt(R2 - R1)
+		# t <- 2 * k * sqrt(r - R1)
+
+		# sqrt profile
+		# k <- ((T2 - T1) / 2) / (R2 - R1)^2
+		# t <- 2 * k * (r - R1)^2
 
 	}
 
@@ -114,6 +118,9 @@ for (i in seq(1, 2*R2+D, 1)) {
 
 }
 
+sm[is.na(sm)] <- 0
+intersection[is.na(intersection)] <- 0
+
 plot(range, sm, type = 'l', xlab = paste('µm,', -(R2+D/2), ':', R2+D/2), ylab = 'intensity', log = '', col = gray(0.8))
 lines(range, smooth(sm), col = 'blue')
 lines(range, intersection, col = 'black')
@@ -130,7 +137,7 @@ abline(v = R2, col='green')
 
 sum_range <- seq(1-shift, dim(scan_map)[1]-shift, 1)
 
-print(sum((intersection[sum_range] - smooth(sm[sum_range]))^2))
+# print(sum((intersection[sum_range] - smooth(sm[sum_range]))^2))
 print(sum((intersection[sum_range] - sm[sum_range])^2))
 print(c(N, R2))
 
