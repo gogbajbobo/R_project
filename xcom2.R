@@ -1,4 +1,5 @@
 source('Developer/R_project/functions.R')
+source('Developer/R_project/xcom_functions.R')
 
 libraryList <- c('XML', 'httpRequest')
 

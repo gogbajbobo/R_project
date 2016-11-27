@@ -1,4 +1,5 @@
-source('/Users/grimax/Documents/Work/ИПТМ эксперимент/2014/TRFZP/r/functions.r')
+source('Developer/R_project/functions.R')
+source('Developer/R_project/xcom_functions.R')
 
 libraryList <- c('XML')
 
