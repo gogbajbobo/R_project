@@ -8,9 +8,9 @@ t_main_shift <- 0 #min
 
 n_add <- 50 #%
 t_add_cycle <- 24*60 #min
-t_add_shift <- 12*60 #min
+t_add_shift <- 16*60 #min
 
-t_full <- 2*24*60 #min
+t_full <- 14*24*60 #min
 t_step <- 60 #min
 
 t_seq <- seq(0, t_full, t_step)
@@ -31,7 +31,7 @@ for (i in 1:length(t_seq)) {
 	if (m_a[i]) {
 		new_value <- new_value + m_a[i]
 	}
-
+	
 	if (length(y)) {
 		y <- c(y, new_value)
 	} else {
