@@ -21,7 +21,7 @@ m_a <- main+add
 
 y <- c()
 
-for (i in 1:length(t_seq)) {
+for (i in 1:length(t_seq)) { # is it possible to rewrite this cycle with vectors math?
 	
 	y_tail <- tail(y, 1)
 	if (is.null(y_tail)) y_tail <- 0
